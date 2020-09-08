@@ -1,0 +1,12 @@
+{
+    "contem": {
+        "1": {
+            "layout": "partes/menu-social",
+            "vars": {
+                "link": "#header",
+                "social": "instagram"
+            }
+        }
+    },
+    "montagem": []
+}

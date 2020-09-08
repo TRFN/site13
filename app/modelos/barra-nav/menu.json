@@ -1,0 +1,33 @@
+{
+    "contem": {
+        "1": {
+            "layout": "partes/menu-link",
+            "vars": {
+                "href": "#bem-vindo",
+                "txt": "Bem vindo!"
+            }
+        },
+        "2": {
+            "layout": "partes/menu-link",
+            "vars": {
+                "href": "#porque-ter-um-site",
+                "txt": "Porque ter um site?"
+            }
+        },
+        "3": {
+            "layout": "partes/menu-link",
+            "vars": {
+                "href": "#criacao-site",
+                "txt": "Preços & Planos"
+            }
+        },
+        "4": {
+            "layout": "partes/menu-link",
+            "vars": {
+                "href": "#contato",
+                "txt": "Contato"
+            }
+        }
+    },
+    "montagem": ["1","2","3","4"]
+}
