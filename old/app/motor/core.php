@@ -1,10 +1,6 @@
 <?php
     class motor {
 
-        private $public_dir = "public_html";
-        private $minjs = false;
-        private $mincss = true;
-
         /* Inicialização */
 
         function __construct(){
@@ -18,7 +14,7 @@
         }
 
         private function rescheck(){
-            $www = realpath(dirname(dirname(__DIR__)) . "/{$this->public_dir}" . $_SERVER["REQUEST_URI"]);
+            $www = realpath(dirname(dirname(__DIR__)) . "/public_html" . $_SERVER["REQUEST_URI"]);
 
             $ext = pathinfo($www,PATHINFO_EXTENSION);
 
@@ -28,13 +24,13 @@
                 switch($ext){
                     case "css":
                         $code = file_get_contents($www);
-                        $code = $this->mincss?(preg_replace(['/\>[^\S ]+/s','/[^\S ]+\</s','/(\s)+/s','/\n/'],['>','<','\\1',''],$code)):$code;
+                        $code = (preg_replace(['/\>[^\S ]+/s','/[^\S ]+\</s','/(\s)+/s','/\n/'],['>','<','\\1',''],$code));
                         $mime = "text/css";
                     break;
 
                     case "js":
                         $jsmin = new jsmin();
-                        $code = $this->minjs?$jsmin->minify(file_get_contents($www)):file_get_contents($www);
+                        $code = $jsmin->minify(file_get_contents($www));
                         $mime = "application/x-javascript";
                     break;
 
@@ -83,7 +79,7 @@
             $this->jsmin = new jsmin();
             $this->app = json_decode(file_get_contents(__DIR__ . "/{$app}.json"));
             $this->app->appDir = dirname(__DIR__);
-            $this->app->publicDir = dirname($this->app->appDir) . "/{$this->public_dir}";
+            $this->app->publicDir = dirname($this->app->appDir) . "/public_html";
             $this->app->page = $_SERVER['REQUEST_URI'];
             $this->applyDefaultVars();
             $this->urlParams = explode("/", $this->app->page);
@@ -111,21 +107,6 @@
                 }
             }
 
-            if(count($exec)){
-                $json = [];
-                foreach($exec as $e){
-                    $dir = explode("_", $e);
-                    array_shift($dir);
-                    array_pop($dir);
-                    $dir = implode("/", $dir);
-
-                    if(file_exists($fl="{$this->app->appDir}/controles/{$dir}/config.json")){
-                        $json[] = json_decode(file_get_contents(realpath($fl)),true);
-                    }
-                }
-                $this->config = $json;
-            }
-
             $this->regVarStrict("layout", $pagina->layout
                 ? $pagina->layout
                 : ""
@@ -151,7 +132,7 @@
                     $scripts .= file_get_contents("{$this->app->appDir}/scripts/{$script}.js") . "\n";
                 }
 
-                $scripts = preg_replace("!/\*.*?\*/!s","",$this->jsmin->minify($scripts, array('flaggedComments' => false)));
+                $scripts = $this->jsmin->minify($scripts);
 
                 $this->regVarStrict("scriptcode", $scripts);
 
@@ -161,17 +142,12 @@
                     $styles .= file_get_contents("{$this->app->appDir}/styles/{$style}.css") . "\n";
                 }
 
-                $this->regVarStrict("stylecode", preg_replace("!/\*.*?\*/!s","",preg_replace(['/\>[^\S ]+/s','/[^\S ]+\</s','/(\s)+/s','/\n/'],['>','<','\\1',''],$styles)));
+                $this->regVarStrict("stylecode", preg_replace(['/\>[^\S ]+/s','/[^\S ]+\</s','/(\s)+/s','/\n/'],['>','<','\\1',''],$styles));
 
                 $this->app->modelo = $modelo;
             }
 
             $this->app->contentType = $pagina->type;
-
-            // header("Content-Type: text/plain");
-            //
-            // print_R($this);
-            // exit;
 
             if(count($exec) > 0){
                 foreach($exec as $_exec){
@@ -181,9 +157,7 @@
         }
 
         private function str2res($str){
-            if(strlen($str) > 320) {
-               return $str;
-            } elseif(file_exists($html = "{$this->app->appDir}/modelos/{$str}.html")){
+            if(file_exists($html = "{$this->app->appDir}/modelos/{$str}.html")){
                 return file_get_contents($html);
             } elseif(file_exists($html = "{$this->app->appDir}/layouts/{$str}.html")){
                 return file_get_contents($html);
@@ -214,10 +188,6 @@
                 }
 
                 return $finalcontent;
-            } elseif(file_exists($fl="{$this->app->appDir}/config/{$str}.json")) {
-                $str = preg_replace("/\./","_",$str);
-                $this->{"{$str}"} = json_decode(file_get_contents(realpath($fl)), true);
-                return md5(realpath($fl));
             } else {
                 return $str;
             }
@@ -307,18 +277,6 @@
 
         public function regVarStrict($var, $val){
             $this->app->vars[$var] =  array("var" => (string)$var, "val" => $this->str2res((string)$val));
-        }
-
-        public function issetVarStrict($var){
-            return isset($this->app->vars[$var]);
-        }
-
-        public function issetVar($var){
-            $existe = false;
-            foreach($this->app->vars as $val){
-                $existe = $existe || ($val["var"] == $var);
-            }
-            return $existe;
         }
 
         public function regVarPersistent($var, $val){

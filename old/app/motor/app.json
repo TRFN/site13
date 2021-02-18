@@ -1,0 +1,34 @@
+{
+    "versao": "1.1.0.0",
+    "https": true,
+    "404": "homepage",
+    "minify": true,
+    "vars": {
+
+    },
+    "paginas": {
+        "homepage": {
+            "caminho": ["/"],
+            "controle": "geral",
+            "modelo": "template",
+            "layout": "paginas/home",
+            "scripts": [],
+            "styles": [],
+            "type": "text/html",
+            "persistente": true,
+            "minify": true,
+            "variaveis": {
+                "barra-nav-logo": "barra-nav/logo",
+                "barra-nav-menu-mobile": "barra-nav/menu-mobile",
+                "barra-nav-menu": "barra-nav/menu",
+                "barra-nav-social": "barra-nav/social",
+                "header": "secoes/header",
+                "servicos": "secoes/servicos",
+                "clientes": "secoes/clientes",
+                "blocos": "secoes/blocos",
+                "precos-site": "secoes/precos-site",
+                "contato": "secoes/contato"
+            }
+        }
+    }
+}
